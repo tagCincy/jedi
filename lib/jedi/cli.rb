@@ -1,6 +1,7 @@
 require 'jedi'
 require 'jedi/vendored_thor'
 require 'fileutils'
+require 'json'
 
 module Jedi
 
@@ -18,9 +19,8 @@ module Jedi
 
     desc 'new APP_NAME', 'generate a new Force.com app'
     def new(name)
-      base_dir = File.expand_path(File.dirname(__FILE__))
       FileUtils.mkdir name
-      FileUtils.cp_r "#{base_dir}/template/.", name, verbose: true
+      FileUtils.cp_r "#{base_dir}/template/.", name, preserve: true
     end
 
     desc 'build', 'generates application and vendor JS files'
