@@ -20,7 +20,7 @@ module Jedi
     def new(name)
       base_dir = File.expand_path(File.dirname(__FILE__))
       FileUtils.mkdir name
-      FileUtils.cp_r "#{base_dir}/template/.", name
+      FileUtils.cp_r "#{base_dir}/template/.", name, verbose: true
     end
 
     desc 'build', 'generates application and vendor JS files'
