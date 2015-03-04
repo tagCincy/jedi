@@ -2,6 +2,7 @@ require 'jedi'
 require 'jedi/vendored_thor'
 require 'fileutils'
 require 'json'
+require 'uglifier'
 
 module Jedi
 
