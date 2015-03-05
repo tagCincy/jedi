@@ -20,6 +20,14 @@ module Jedi
       raise e
     end
 
+    desc 'init', "initialize jedi"
+    method_option :dir, alias: "-d", desc: "where to install resource components (defaults to current directory)"
+    def init
+      target_dir = options[:dir] || Dir.pwd
+      FileUtils.cp_r template_dir, target_dir
+    end
+
+
     desc 'new APP_NAME', 'generate a new Force.com app'
     def new(name)
       FileUtils.mkdir name
@@ -37,6 +45,10 @@ module Jedi
 
     def base_dir
       Dir.pwd
+    end
+
+    def template_dir
+      "#{base_dir}/template/."
     end
 
     def build_dir
