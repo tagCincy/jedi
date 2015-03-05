@@ -1,18 +1,14 @@
 require 'jedi'
 require 'jedi/vendored_thor'
 require 'fileutils'
-require 'json'
-require 'coffee-script'
 require 'uglifier'
-require 'sass'
+require 'yui/compressor'
+require 'sprockets'
 
 module Jedi
 
   class CLI < Thor
     include Thor::Actions
-
-    JS_MATCHERS = "coffee, js"
-    CSS_MATCHERS = "scss, sass, css"
 
     def self.start(*)
       super
@@ -22,79 +18,81 @@ module Jedi
 
     desc 'init', "initialize jedi"
     method_option :dir, alias: "-d", desc: "where to install resource components (defaults to current directory)"
+
     def init
-      target_dir = options[:dir] || Dir.pwd
+      target_dir = options[:dir] || base_dir
       FileUtils.cp_r template_dir, target_dir
     end
 
+    desc 'compile', 'compiles and concats assets'
 
-    desc 'new APP_NAME', 'generate a new Force.com app'
-    def new(name)
-      FileUtils.mkdir name
-      FileUtils.cp_r "#{base_dir}/template/.", name, preserve: true
-    end
+    def compile
+      @asset_paths = Array([components_path, vendor_path])
+      @destination = "#{build_path}/components"
+      @root_file = Array(["#{components_path}/javascripts/application.js", "#{components_path}/javascripts/vendor.js"])
 
-    desc 'build', 'generates application and vendor JS files'
-    def build
-      remove_last_build
-      build_js
-      build_css
+      @sprockets = ::Sprockets::Environment.new
+      @asset_paths.each { |p| @sprockets.append_path(p) }
+      @root_file.each { |f| @sprockets.append_path(Pathname.new(f).dirname) }
+      @sprockets.js_compressor = ::Uglifier.new
+      @sprockets.css_compressor = YUI::CssCompressor.new
+
+      paths = @root_file unless @root_file.empty?
+
+      paths.each do |file|
+        sprocketize(file)
+      end
     end
 
     private
+
+    def gem_dir
+      File.expand_path(File.dirname(__FILE__))
+    end
 
     def base_dir
       Dir.pwd
     end
 
     def template_dir
-      "#{base_dir}/template/."
+      "#{gem_dir}/template/."
     end
 
-    def build_dir
-      File.join(base_dir, 'build')
+    def components_path
+      "#{base_dir}/components"
     end
 
-    def assets_dir
-      File.join(base_dir, 'app', 'assets')
+    def vendor_path
+      "#{base_dir}/components/vendor"
     end
 
-    def manifest
-      json = JSON.parse(File.read(File.join(assets_dir, 'assets.json')))
-      Struct.new(:js, :css).new(json['js'], json['css'])
+    def build_path
+      "#{base_dir}/build"
     end
 
-    def gather_assets(type, matchers, list)
-      list.map { |l| Dir.glob(File.join(assets_dir, type, "#{l}.{#{matchers}}")) }.flatten
+    def sprocketize(path)
+      path = Pathname.new(path)
+
+      output_filename = without_preprocessor_extension @asset_paths.find_all { |p| path.to_s.start_with?(p) }
+                                             .collect { |p| Pathname.new(p) }
+                                             .collect { |p| path.relative_path_from(p) }
+                                             .min_by { |p| p.to_s.size }
+                                             .to_s
+
+      output_path = Pathname.new File.join(@destination, output_filename)
+
+      FileUtils.mkdir_p(output_path.parent) unless output_path.parent.exist?
+
+      output_path.open('w') { |f| f.write @sprockets[output_filename] }
+
+      puts "Sprockets compiled #{output_filename}"
+    rescue ExecJS::ProgramError => ex
+      puts "Sprockets failed compiling #{output_filename}!", priority: 2, image: :failed
+      false
     end
 
-    def build_js
-      assets = gather_assets('javascript', JS_MATCHERS, manifest.js)
-
-      combined = assets.map { |asset|
-        src = File.read(asset)
-        CoffeeScript.compile(src) if File.split(asset).last.include? '.coffee'
-      }.join("\n")
-
-      compiled = Uglifier.compile(combined)
-
-      File.new(File.join(build_dir, 'javascript', "application.js"), 'w').write(compiled)
+    def without_preprocessor_extension(filename)
+      filename.gsub /^(.*\.(?:js|css))\.[^.]+(\.erb)?$/, '\1'
     end
-
-    def build_css
-      assets = gather_assets('stylesheets', CSS_MATCHERS, manifest.css)
-
-      compiled = assets.map { |asset|
-        Sass.compile(File.read(asset), style: :compressed)
-      }.join("\n")
-
-      File.new(File.join(build_dir, 'stylesheets', 'application.css'), 'w').write(compiled)
-    end
-
-    def remove_last_build
-      FileUtils.rm_r(Dir.glob(File.join(build_dir, '*')))
-      FileUtils.mkdir([File.join(build_dir, 'javascript'), File.join(build_dir, 'stylesheets')])
-    end
-
   end
 end
