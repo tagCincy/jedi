@@ -1,0 +1,3 @@
+guard :sprockets, destination: 'build/javascripts', asset_paths: ['components/javascripts'] do
+  watch 'components/javascripts/application.js'
+end
