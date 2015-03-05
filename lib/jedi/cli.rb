@@ -2,7 +2,9 @@ require 'jedi'
 require 'jedi/vendored_thor'
 require 'fileutils'
 require 'json'
+require 'coffee-script'
 require 'uglifier'
+require 'sass'
 
 module Jedi
 
@@ -26,7 +28,9 @@ module Jedi
 
     desc 'build', 'generates application and vendor JS files'
     def build
+      remove_last_build
       build_js
+      build_css
     end
 
     private
@@ -35,23 +39,49 @@ module Jedi
       Dir.pwd
     end
 
+    def build_dir
+      File.join(base_dir, 'build')
+    end
+
+    def assets_dir
+      File.join(base_dir, 'app', 'assets')
+    end
+
     def manifest
-      json = JSON.parse(File.read(File.join(base_dir, 'app', 'assets', 'assets.json')))
+      json = JSON.parse(File.read(File.join(assets_dir, 'assets.json')))
       Struct.new(:js, :css).new(json['js'], json['css'])
     end
 
     def gather_assets(type, matchers, list)
-      list.map { |l| Dir.glob(File.join(base_dir, 'assets', type, "#{l}.{#{matchers}}")) }.flatten
+      list.map { |l| Dir.glob(File.join(assets_dir, type, "#{l}.{#{matchers}}")) }.flatten
     end
 
     def build_js
       assets = gather_assets('javascript', JS_MATCHERS, manifest.js)
-      combined = assets.map do |asset|
+
+      combined = assets.map { |asset|
         src = File.read(asset)
         CoffeeScript.compile(src) if File.split(asset).last.include? '.coffee'
-      end
+      }.join("\n")
+
       compiled = Uglifier.compile(combined)
-      File.new(File.join(base_dir, 'build', 'javascript', "application-#{Time.now.iso8601}.js"), 'w').write(compiled)
+
+      File.new(File.join(build_dir, 'javascript', "application.js"), 'w').write(compiled)
+    end
+
+    def build_css
+      assets = gather_assets('stylesheets', CSS_MATCHERS, manifest.css)
+
+      compiled = assets.map { |asset|
+        Sass.compile(File.read(asset), style: :compressed)
+      }.join("\n")
+
+      File.new(File.join(build_dir, 'stylesheets', 'application.css'), 'w').write(compiled)
+    end
+
+    def remove_last_build
+      FileUtils.rm_r(Dir.glob(File.join(build_dir, '*')))
+      FileUtils.mkdir([File.join(build_dir, 'javascript'), File.join(build_dir, 'stylesheets')])
     end
 
   end

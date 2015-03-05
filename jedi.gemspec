@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Tim Guibord"]
   spec.email         = ["timguibord@gmail.com"]
   spec.summary       = %q{Force.com Application Goodness}
-  spec.description   = %q{Long Dexcription}
+  spec.description   = %q{Ruby based Force.com Application development framework}
   spec.homepage      = ""
   spec.license       = "MIT"
 
