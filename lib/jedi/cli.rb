@@ -2,6 +2,7 @@ require 'jedi'
 require 'fileutils'
 require 'thor'
 require 'sprockets'
+require 'sprockets-sass'
 require 'uglifier'
 require 'sass'
 
@@ -30,7 +31,7 @@ module Jedi
       @asset_paths = Array([components_path, vendor_path])
       @destination = "#{build_path}/components"
       @root_file = Array(["#{components_path}/javascripts/application.js", "#{components_path}/javascripts/vendor.js",
-                          "#{components_path}/stylesheets/application.css", "#{components_path}/stylesheets/vendor.css"])
+                          "#{components_path}/stylesheets/application.css"])
 
       @sprockets = ::Sprockets::Environment.new
       @asset_paths.each { |p| @sprockets.append_path(p) }

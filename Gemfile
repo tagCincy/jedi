@@ -12,3 +12,4 @@ gem 'uglifier', '~> 2.7.1'
 gem 'yui-compressor', '~> 0.12.0'
 
 gem 'sprockets', '~> 2.12.3'
+gem 'sprockets-sass', '~> 1.3.1'
