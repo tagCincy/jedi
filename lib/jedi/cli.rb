@@ -1,9 +1,9 @@
 require 'jedi'
-require 'jedi/vendored_thor'
 require 'fileutils'
-require 'uglifier'
-require 'yui/compressor'
+require 'thor'
 require 'sprockets'
+require 'uglifier'
+require 'sass'
 
 module Jedi
 
@@ -29,13 +29,14 @@ module Jedi
     def compile
       @asset_paths = Array([components_path, vendor_path])
       @destination = "#{build_path}/components"
-      @root_file = Array(["#{components_path}/javascripts/application.js", "#{components_path}/javascripts/vendor.js"])
+      @root_file = Array(["#{components_path}/javascripts/application.js", "#{components_path}/javascripts/vendor.js",
+                          "#{components_path}/stylesheets/application.css", "#{components_path}/stylesheets/vendor.css"])
 
       @sprockets = ::Sprockets::Environment.new
       @asset_paths.each { |p| @sprockets.append_path(p) }
       @root_file.each { |f| @sprockets.append_path(Pathname.new(f).dirname) }
-      @sprockets.js_compressor = ::Uglifier.new
-      @sprockets.css_compressor = YUI::CssCompressor.new
+      @sprockets.js_compressor = :uglifier
+      @sprockets.css_compressor = :scss
 
       paths = @root_file unless @root_file.empty?
 
