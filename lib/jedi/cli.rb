@@ -1,100 +1,80 @@
 require 'jedi'
 require 'fileutils'
 require 'thor'
-require 'sprockets'
-require 'sprockets-sass'
-require 'uglifier'
-require 'sass'
 
 module Jedi
 
   class CLI < Thor
     include Thor::Actions
 
+    attr_accessor :shell
+
     def self.start(*)
+      @shell = Thor::Shell::Basic.new
       super
     rescue Exception => e
       raise e
     end
 
-    desc 'init', "initialize jedi"
-    method_option :dir, alias: "-d", desc: "where to install resource components (defaults to current directory)"
-
-    def init
-      target_dir = options[:dir] || base_dir
-      FileUtils.cp_r template_dir, target_dir
+    desc "new NAME", "creates a new, default Force.com project"
+    def new(name)
+      require 'jedi/cli/init'
+      Init.new(name: name).run
     end
 
-    desc 'compile', 'compiles and concats assets'
+    desc "build", "compiles all assets and creates resources archive"
+    method_option :name, aliases: "-n", desc: "Force.com StaticResource package name", default: "Assets"
+    def build
+      invoke :compile
+      invoke :package, options[:name]
+    end
 
+    desc 'compile', 'compile, concat and minify JS, CSS and HTML assets'
+    method_option :only, aliases: "-o", type: :array, enum: %w(js css html), desc: "selective which asset types to compile", required: false
     def compile
-      @asset_paths = Array([components_path, vendor_path])
-      @destination = "#{build_path}/components"
-      @root_file = Array(["#{components_path}/javascripts/application.js", "#{components_path}/javascripts/vendor.js",
-                          "#{components_path}/stylesheets/application.css"])
+      invoke :clean, [], only: options[:only]
 
-      @sprockets = ::Sprockets::Environment.new
-      @asset_paths.each { |p| @sprockets.append_path(p) }
-      @root_file.each { |f| @sprockets.append_path(Pathname.new(f).dirname) }
-      @sprockets.js_compressor = :uglifier
-      @sprockets.css_compressor = :scss
-
-      paths = @root_file unless @root_file.empty?
-
-      paths.each do |file|
-        sprocketize(file)
-      end
+      require 'jedi/cli/compile'
+      Compile.new(only: options[:only]).run
     end
 
-    private
-
-    def gem_dir
-      File.expand_path(File.dirname(__FILE__))
+    desc 'package NAME', 'package assets into Force.com StaticResource archive'
+    def package(name="Assets")
+      require 'jedi/cli/package'
+      Package.new(name: name).run
     end
 
-    def base_dir
-      Dir.pwd
+    desc 'clean', 'clean compiled assets'
+    method_option :only, aliases: "-o", type: :array, enum: %w(js css html), desc: "select which asset types to clean", required: false
+    def clean
+      require 'jedi/cli/clean'
+      Clean.new(options).run
     end
 
-    def template_dir
-      "#{gem_dir}/template/."
+    desc "meta COMMAND", "run a Force.com Metadata Migration Command"
+    method_option "env", aliases: "-e", type: "string", default: "dev", desc: "which Salesforce environment to connect"
+    method_option "build", aliases: "-b", type: "string", desc: "use a custom build file", required: false
+
+    def meta(command="describe")
+      require 'jedi/cli/meta'
+      Meta.new(options.merge({command: command})).run
     end
 
-    def components_path
-      "#{base_dir}/components"
-    end
+    # desc "bower_install PKG", "install bower package in the /components/vendor"
+    # def bower_install(pkg)
+    #   bower_version = `bower --v` rescue nil
+    #
+    #   if bower_version.nil?
+    #     if (`npm --v` rescue nil).nil?
+    #       puts "Please install NPM before continuing"
+    #       false
+    #     end
+    #
+    #     IOP
+    #
+    #
+    #   end
+    # end
 
-    def vendor_path
-      "#{base_dir}/components/vendor"
-    end
-
-    def build_path
-      "#{base_dir}/build"
-    end
-
-    def sprocketize(path)
-      path = Pathname.new(path)
-
-      output_filename = without_preprocessor_extension @asset_paths.find_all { |p| path.to_s.start_with?(p) }
-                                             .collect { |p| Pathname.new(p) }
-                                             .collect { |p| path.relative_path_from(p) }
-                                             .min_by { |p| p.to_s.size }
-                                             .to_s
-
-      output_path = Pathname.new File.join(@destination, output_filename)
-
-      FileUtils.mkdir_p(output_path.parent) unless output_path.parent.exist?
-
-      output_path.open('w') { |f| f.write @sprockets[output_filename] }
-
-      puts "Sprockets compiled #{output_filename}"
-    rescue ExecJS::ProgramError => ex
-      puts "Sprockets failed compiling #{output_filename}!", priority: 2, image: :failed
-      false
-    end
-
-    def without_preprocessor_extension(filename)
-      filename.gsub /^(.*\.(?:js|css))\.[^.]+(\.erb)?$/, '\1'
-    end
   end
 end

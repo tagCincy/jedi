@@ -3,6 +3,8 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'thor', '~> 0.19.1'
+gem 'nokogiri', '~> 1.6.6.2'
+gem 'rubyzip', '>= 1.0.0'
 
 gem 'coffee-script', '~> 2.3.0'
 gem 'sass', '~> 3.4.13'
