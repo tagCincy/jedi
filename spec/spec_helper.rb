@@ -3,7 +3,7 @@ $:.unshift File.expand_path('../../lib/', __FILE__)
 Dir.glob(File.join(Dir.pwd, "lib", "**", "*#{File::Separator}")).each { |f| $:.unshift f }
 
 require 'coveralls'
-Coveralls.wear!
+Coveralls.wear!(:test_frameworks)
 
 require 'rspec'
 require 'fileutils'
