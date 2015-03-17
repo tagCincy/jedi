@@ -1,4 +1,6 @@
 # Jedi
+[![Build Status](https://travis-ci.org/tagCincy/jedi.svg?branch=development)](https://travis-ci.org/tagCincy/jedi)
+[![Coverage Status](https://coveralls.io/repos/tagCincy/jedi/badge.svg?branch=development)](https://coveralls.io/r/tagCincy/jedi?branch=development)
 
 TODO: Write a gem description
 
