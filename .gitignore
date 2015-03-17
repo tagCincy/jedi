@@ -15,4 +15,5 @@ mkmf.log
 
 /.idea
 /.ruby-*
-/.sass-cache
+/**/.sass-cache
+/**/.DS_Store
