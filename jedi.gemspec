@@ -23,4 +23,15 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry", "~> 0.10.1"
   spec.add_development_dependency "rspec", "~> 3.2.0"
   spec.add_development_dependency "coveralls", "~> 0.7.11"
+
+  spec.add_runtime_dependency 'thor', '~> 0.19.1'
+  spec.add_runtime_dependency 'nokogiri', '~> 1.6.6.2'
+  spec.add_runtime_dependency 'rubyzip', '>= 1.0.0'
+  spec.add_runtime_dependency 'coffee-script', '~> 2.3.0'
+  spec.add_runtime_dependency 'sass', '~> 3.4.13'
+  spec.add_runtime_dependency 'haml', '~> 4.0.6'
+  spec.add_runtime_dependency 'uglifier', '~> 2.7.1'
+  spec.add_runtime_dependency 'yui-compressor', '~> 0.12.0'
+  spec.add_runtime_dependency 'sprockets', '~> 2.12.3'
+  spec.add_runtime_dependency 'sprockets-sass', '~> 1.3.1'
 end

@@ -1,20 +1,15 @@
-require 'fileutils'
-require 'nokogiri'
+class Jedi::CLI::Init < Thor::Group
+  include Thor::Actions
 
-class Jedi::CLI::Init
-  attr_reader :options
+  # argument :name, type: :string, desc: "name of the Force.com project"
+  # desc "creates a new Force.com project"
 
-  def initialize(opts)
-    @options = opts
+  def self.source_root
+    File.dirname(__FILE__)
   end
 
-  def run
-    FileUtils.cp_r template_path, base_path
-
-    build_xml = Nokogiri::XML(File.read(File.join(ant_path, "build.xml")))
-    build_xml.css("project").attr("name").value = @options[:name]
-    local_build_file = File.join(config_path, "build.xml")
-    File.open(local_build_file, "w") { |f| f.write(build_xml) }
+  def init
+    directory template_path, base_path
   end
 
   private
@@ -28,11 +23,11 @@ class Jedi::CLI::Init
   end
 
   def template_path
-    "#{gem_path}/template/."
+    "#{gem_path}/template"
   end
 
   def base_path
-    "#{Dir.pwd}/#{@options[:name]}"
+    Dir.pwd
   end
 
   def config_path

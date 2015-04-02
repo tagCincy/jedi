@@ -16,12 +16,8 @@ module FileHelper
     root.join(tmp, "sample")
   end
 
-  def app
-    root.join(sample, "app")
-  end
-
   def src
-    root.join(app, "src")
+    root.join(sample, "src")
   end
 
   def staticresources

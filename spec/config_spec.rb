@@ -6,8 +6,8 @@ describe Jedi::Config do
     FileUtils.chdir "sample"; ex.run; FileUtils.chdir ".."
   end
 
-  let(:paths) {["#{Dir.pwd}/components", "#{Dir.pwd}/components/vendor"]}
-  let(:roots) {["#{Dir.pwd}/components/javascripts/application.js", "#{Dir.pwd}/components/stylesheets/application.css"]}
+  let(:paths) {["#{Dir.pwd}/resources", "#{Dir.pwd}/resources/vendor"]}
+  let(:roots) {["#{Dir.pwd}/resources/javascripts/application.js", "#{Dir.pwd}/resources/stylesheets/application.css"]}
   let(:configs) {Jedi::Config.new}
 
   it 'should respond to #asset_paths' do

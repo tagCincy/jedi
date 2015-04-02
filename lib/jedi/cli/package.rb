@@ -52,11 +52,11 @@ class Jedi::CLI::Package
   end
 
   def components_path
-    "#{Dir.pwd}/build/components"
+    "#{Dir.pwd}/build"
   end
 
   def output_path
-    "#{Dir.pwd}/app/src/staticresources"
+    "#{Dir.pwd}/src/staticresources"
   end
 
   def resources_archive

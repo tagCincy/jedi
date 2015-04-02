@@ -21,6 +21,6 @@ class Jedi::CLI::Clean
   end
 
   def build_path
-    "#{Dir.pwd}/build/components"
+    "#{Dir.pwd}/build"
   end
 end

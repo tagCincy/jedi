@@ -4,7 +4,7 @@ class Jedi::Config
   attr_reader :config
 
   def initialize
-    @config = YAML.load(File.read(File.join(Dir.pwd, "app", "config", "config.yml")))
+    @config = YAML.load(File.read(File.join(Dir.pwd, "resources", "config.yml")))
   end
 
   def asset_paths

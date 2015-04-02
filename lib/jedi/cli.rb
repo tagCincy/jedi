@@ -15,7 +15,14 @@ class Jedi::CLI < Thor
 
   def new(name)
     require 'jedi/cli/init'
-    Init.new(name: name).run
+    invoke Init, [name]
+    # Init.new(name: name).run
+  end
+
+  desc "init", "add resource management to Force.com project"
+  def init
+    require 'jedi/cli/init'
+    invoke Init
   end
 
   desc "build", "compiles all assets and creates resources archive"

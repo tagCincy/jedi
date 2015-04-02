@@ -23,11 +23,11 @@ class Jedi::CLI::Compile
   private
 
   def destination_path
-    "#{Dir.pwd}/build/components"
+    "#{Dir.pwd}/build"
   end
 
   def templates_path
-    "#{Dir.pwd}/components/templates"
+    "#{Dir.pwd}/resources/templates"
   end
 
   def compile_all
