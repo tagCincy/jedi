@@ -1,0 +1,2 @@
+asset_paths: ['resources', 'resources/vendor']
+asset_roots: ['application.js', 'vendor.js', 'application.css']

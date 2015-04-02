@@ -1,0 +1,1 @@
+(function(){var o;this.foo="Hello",o=function(){return this.foo+" World!"}}).call(this);

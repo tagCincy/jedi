@@ -1,0 +1,23 @@
+language: ruby
+env:
+  global:
+    - JRUBY_OPTS="$JRUBY_OPTS --debug"
+rvm:
+  - 2.0
+  - 2.1
+  - 2.2
+  - jruby-18mode
+  - jruby-19mode
+  - jruby-head
+  - rbx-2
+  - ruby-head
+matrix:
+  allow_failures:
+    - rvm: jruby-18mode
+    - rvm: jruby-19mode
+    - rvm: jruby-head
+    - rvm: rbx-2
+    - rvm: ruby-head
+  fast_finish: true
+script: bundle exec rspec
+sudo: false
