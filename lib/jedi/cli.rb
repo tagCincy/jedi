@@ -58,20 +58,20 @@ class Jedi::CLI < Thor
     Clean.new(options).run
   end
 
-  desc "meta COMMAND", "run a Force.com Metadata Migration Command"
-  method_option "env", aliases: "-e", type: "string", default: "dev", desc: "which Salesforce environment to connect"
-  method_option "build", aliases: "-b", type: "string", desc: "use a custom build file", required: false
-
-  def meta(command="describe")
-    require 'jedi/cli/meta'
-    Meta.new(options.merge({command: command})).run
-  end
-
-  desc "generate TYPE NAME", "generate a new Force.com object"
-
-  def generate(type, name)
-    binding.pry
-  end
+  # desc "meta COMMAND", "run a Force.com Metadata Migration Command"
+  # method_option "env", aliases: "-e", type: "string", default: "dev", desc: "which Salesforce environment to connect"
+  # method_option "build", aliases: "-b", type: "string", desc: "use a custom build file", required: false
+  #
+  # def meta(command="describe")
+  #   require 'jedi/cli/meta'
+  #   Meta.new(options.merge({command: command})).run
+  # end
+  #
+  # desc "generate TYPE NAME", "generate a new Force.com object"
+  #
+  # def generate(type, name)
+  #   binding.pry
+  # end
 
   # desc "bower_install PKG", "install bower package in the /components/vendor"
   # def bower_install(pkg)

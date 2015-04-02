@@ -88,8 +88,8 @@ class Jedi::CLI::Compile
   def set_sprockets
     env = Sprockets::Environment.new
     @asset_paths.each { |p| env.append_path(p) }
-    env.css_compressor = :sass
-    env.js_compressor = :uglifier
+    # env.css_compressor = :sass
+    # env.js_compressor = :uglifier
     env
   end
 end
